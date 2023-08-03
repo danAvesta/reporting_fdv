@@ -55,7 +55,10 @@ class DashboardController extends AbstractDashboardController
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         yield MenuItem::section('Rendez-vous');
         yield MenuItem::linkToCrud('Rendez-vous', 'fas fa-calendar', Rdv::class);
-        yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
+        if ($this->isGranted('ROLE_ADMIN')) {
+            yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
+        }
+        
         // yield MenuItem::subMenu('Actions', 'fas fa-bars')->setSubItems([]);
 
 
