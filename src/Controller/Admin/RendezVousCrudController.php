@@ -50,8 +50,9 @@ class RendezVousCrudController extends AbstractCrudController
         if(!$entityInstance instanceof RendezVous) return;
 
         $user = $this->security->getUser();
+        dd($user);
         if(!$user) return;
-
+        
         $entityInstance->setIdUser($user->getId());
         $entityInstance->setDateCreation(new \DateTimeImmutable);
         $entityInstance->setDateUpdate(new \DateTimeImmutable);

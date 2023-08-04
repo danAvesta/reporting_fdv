@@ -7,6 +7,7 @@ parameters:
 
 services:
     # default configuration for services in *this* file
+    Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface: '@security.password_hasher'
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
