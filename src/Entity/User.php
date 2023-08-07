@@ -169,4 +169,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function __toString() 
+    {
+        // return the property you want to show
+        return $this->prenom .' ' . $this->nom;
+    }
 }

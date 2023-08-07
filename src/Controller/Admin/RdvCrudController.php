@@ -41,12 +41,6 @@ class RdvCrudController extends AbstractCrudController
     
     public function configureFields(string $pageName): iterable
     {
-        $roles = [
-            'User'   => 'ROLE_USER',
-            'Agency' => 'ROLE_AGENCY',
-            'Admin'  => 'ROLE_ADMIN'
-        ];
-
         // yield IdField::new('id');
 
         yield DateTimeField::new('dateRdv');
@@ -57,16 +51,16 @@ class RdvCrudController extends AbstractCrudController
         yield TextField::new('codePostal');
 
         if($this->isGranted('ROLE_ADMIN')){
-            yield AssociationField::new('commercial')->autocomplete()->setCrudController(UserCrudController::class);
+            yield AssociationField::new('commercial')->autocomplete();
         }
         yield DateTimeField::new('createDate')->hideOnForm();
+        yield IntegerField::new('statut');
         
         return [
             // IdField::new('createBy')->hideOnForm(),
             
+            true
             
-            // ChoiceField::new('commercial')->autocomplete()->setChoices([$roles]),
-            IntegerField::new('statut')
         ];
     }
 
