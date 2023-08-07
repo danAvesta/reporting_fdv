@@ -34,6 +34,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'commercial', targetEntity: RendezVous::class, orphanRemoval: true)]
     private Collection $rendezVouses;
 
+    #[ORM\Column(length: 255)]
+    private ?string $Nom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Prenom = null;
+
     public function __construct()
     {
         $this->rendezVouses = new ArrayCollection();
@@ -101,8 +107,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
     public function __toString() 
     {
-        // return the property you want to show
-        return $this->email;
+        return $this->Prenom.' '.$this->Nom;
     }
 
 
@@ -141,6 +146,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $rendezVouse->setCommercial(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->Nom;
+    }
+
+    public function setNom(string $Nom): static
+    {
+        $this->Nom = $Nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->Prenom;
+    }
+
+    public function setPrenom(string $Prenom): static
+    {
+        $this->Prenom = $Prenom;
 
         return $this;
     }
