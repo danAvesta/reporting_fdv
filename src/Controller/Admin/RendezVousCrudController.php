@@ -13,7 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use phpDocumentor\Reflection\Types\Void_;
 use Symfony\Component\Security\Core\Security;
-
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 class RendezVousCrudController extends AbstractCrudController
 {
     private $security;
@@ -22,6 +22,7 @@ class RendezVousCrudController extends AbstractCrudController
     {
         $this->security = $security;
     }
+    
 
     public static function getEntityFqcn(): string
     {
@@ -29,11 +30,13 @@ class RendezVousCrudController extends AbstractCrudController
     }
 
     
+    
+
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
-            IdField::new('IdUser')->hideOnForm(),
+            //IdField::new('IdUser')->hideOnForm(),
             TextField::new('NomEnseigne'),
             TextField::new('Ville'),
             NumberField::new('CodePostal'),
@@ -42,20 +45,24 @@ class RendezVousCrudController extends AbstractCrudController
             DateTimeField::new('DateRdv'),
             DateTimeField::new('DateCreation')->hideOnForm(),
             DateTimeField::new('DateUpdate')->hideOnForm(),
+            AssociationField::new('commercial'), // note the change in case here
         ];
     }
-
+    
     public function persistEntity(EntityManagerInterface $em, $entityInstance) : void
     {
         if(!$entityInstance instanceof RendezVous) return;
 
         $user = $this->security->getUser();
-        dd($user);
-        if(!$user) return;
-        
-        $entityInstance->setIdUser($user->getId());
+
+        if(!$user) {
+            // The user is not logged in. Handle this situation as you see fit.
+            throw new \Exception('You must be logged in to create a rendezvous.');
+        }
+
         $entityInstance->setDateCreation(new \DateTimeImmutable);
         $entityInstance->setDateUpdate(new \DateTimeImmutable);
+        $entityInstance->setCommercial($user);
 
         parent::persistEntity($em, $entityInstance);
     }

@@ -14,8 +14,8 @@ class RendezVous
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $IdUser = null;
+    // #[ORM\Column]
+    // private ?int $IdUser = null;
 
     #[ORM\Column(length: 255)]
     private ?string $NomEnseigne = null;
@@ -41,24 +41,20 @@ class RendezVous
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $DateUpdate = null;
 
+    #[ORM\ManyToOne(inversedBy: 'rendezVouses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $commercial = null;
+
+
+    
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getIdUser(): ?int
-    {
-        return $this->IdUser;
-    }
-
-    public function setIdUser(int $IdUser): static
-    {
-        $this->IdUser = $IdUser;
-
-        return $this;
-    }
-
-    public function getNomEnseigne(): ?string
+ 
+        public function getNomEnseigne(): ?string
     {
         return $this->NomEnseigne;
     }
@@ -153,4 +149,20 @@ class RendezVous
 
         return $this;
     }
+
+    public function getCommercial(): ?User
+    {
+        return $this->commercial;
+    }
+
+    public function setCommercial(?User $commercial): static
+    {
+        $this->commercial = $commercial;
+
+        return $this;
+    }
+    
+
+
+
 }
