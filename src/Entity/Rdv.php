@@ -37,6 +37,15 @@ class Rdv
     #[ORM\JoinColumn(nullable: false)]
     private ?User $commercial = null;
 
+    #[ORM\Column(length: 6)]
+    private ?string $codePostal = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $contactNom = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $contactTel = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +131,42 @@ class Rdv
     public function setCommercial(?User $commercial): static
     {
         $this->commercial = $commercial;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(string $codePostal): static
+    {
+        $this->codePostal = $codePostal;
+
+        return $this;
+    }
+
+    public function getContactNom(): ?string
+    {
+        return $this->contactNom;
+    }
+
+    public function setContactNom(string $contactNom): static
+    {
+        $this->contactNom = $contactNom;
+
+        return $this;
+    }
+
+    public function getContactTel(): ?string
+    {
+        return $this->contactTel;
+    }
+
+    public function setContactTel(?string $contactTel): static
+    {
+        $this->contactTel = $contactTel;
 
         return $this;
     }
