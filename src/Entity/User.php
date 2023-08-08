@@ -15,9 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public function configureCrud(Crud $crud):Crud{
-        return $crud->setEntityPermission("ROLE_ADMIN");
-    }
+  
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

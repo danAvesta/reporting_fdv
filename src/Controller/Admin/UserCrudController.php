@@ -12,9 +12,24 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 
 class UserCrudController extends AbstractCrudController
 {
+    public function index(AdminContext $context): Response
+    {
+        $user = $this->getUser(); 
+
+       
+        if (!$user || !in_array('ROLE_ADMIN', $user->getRoles())) {
+            throw new AccessDeniedException();
+        }
+
+       
+        return parent::index($context);
+    }
     public static function getEntityFqcn(): string
     {
         return User::class;

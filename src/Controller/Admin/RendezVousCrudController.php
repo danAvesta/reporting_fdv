@@ -71,7 +71,7 @@ class RendezVousCrudController extends AbstractCrudController
                 DateTimeField::new('DateRdv'),
                 DateTimeField::new('DateCreation')->hideOnForm(),
                 DateTimeField::new('DateUpdate')->hideOnForm(),
-                AssociationField::new('commercial')->hideOnDetail()->hideOnForm(),
+                AssociationField::new('commercial')->hideOnDetail()->hideOnForm()->hideOnIndex(),
             ];
         }
         
@@ -107,7 +107,7 @@ class RendezVousCrudController extends AbstractCrudController
         $user = $this->security->getUser();
 
         if(!$user) {
-            // The user is not logged in. Handle this situation as you see fit.
+            
             throw new \Exception('You must be logged in to create a rendezvous.');
         }
 
