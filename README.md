@@ -6,7 +6,7 @@ User:
   - faire page login
 
 Rdv:
-  - voir que les rdv concernant le commercial connecté
+  - ~~voir que les rdv concernant le commercial connecté~~
   - trier les rdv par date de rdv
 
 
