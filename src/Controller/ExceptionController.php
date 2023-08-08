@@ -11,7 +11,7 @@ class ExceptionController
     public function showException(\Throwable $exception): Response
     {
         if ($exception instanceof AccessDeniedException) {
-            return new Response($content = $this->renderView('templates/admin/error_permission.html.twig'), 403);
+            return new Response($content = $this->renderView('admin/error_permission.html.twig'), 403);
         }
 
         // Gérez les autres types d'exceptions si nécessaire

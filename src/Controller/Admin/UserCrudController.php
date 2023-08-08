@@ -15,28 +15,21 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+
+
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 
 class UserCrudController extends AbstractCrudController
 {
-    public function index(AdminContext $context): Response
-    {
-        $user = $this->getUser(); 
-
-       
-        if (!$user || !in_array('ROLE_ADMIN', $user->getRoles())) {
-            throw new AccessDeniedException();
-        }
-
-       
-        return parent::index($context);
-    }
+    
+    
     public static function getEntityFqcn(): string
     {
         return User::class;
     }
-    public function configureCrud(Crud $crud):Crud{
-        return $crud->setEntityPermission("ROLE_ADMIN");
-    }
+    
     private $passwordEncoder;
 
     public function __construct(UserPasswordHasherInterface $passwordEncoder)
@@ -44,18 +37,31 @@ class UserCrudController extends AbstractCrudController
         $this->passwordEncoder = $passwordEncoder;
     }
     
+    
 
     
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('id')->hideOnForm(),
-            TextField::new('Nom'),
-            TextField::new('Prenom'),
-            EmailField::new('email'),
-            TextField::new('password', 'Mot de passe')->hideOnIndex()->hideOnDetail()->hideWhenUpdating()->setFormType(PasswordType::class),
-            ArrayField::new('roles'),
-        ];
+        $user = $this->getUser();
+        if ($user && in_array('ROLE_ADMIN', $user->getRoles())) {
+            return [
+                IdField::new('id')->hideOnForm(),
+                TextField::new('Nom'),
+                TextField::new('Prenom'),
+                EmailField::new('email'),
+                TextField::new('password', 'Mot de passe')->hideOnIndex()->hideOnDetail()->hideWhenUpdating()->setFormType(PasswordType::class),
+                ArrayField::new('roles'),
+            ];
+        }else{
+            return [
+                IdField::new('id')->hideOnIndex()->hideOnDetail()->hideWhenUpdating()->hideOnForm(),
+                TextField::new('Nom'),
+                TextField::new('Prenom'),
+                EmailField::new('email'),
+                TextField::new('password', 'Mot de passe')->hideOnIndex()->hideOnDetail()->hideWhenUpdating()->setFormType(PasswordType::class),
+                ArrayField::new('roles')->hideOnIndex()->hideOnDetail()->hideWhenUpdating()->hideOnForm(),
+            ];
+        }
     }
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
@@ -70,4 +76,28 @@ class UserCrudController extends AbstractCrudController
             $user->getPassword()
         ));
     }
+    public function configureActions(Actions $actions): Actions
+    {
+        $user = $this->getUser();
+
+        if ($user && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            
+            $actions->disable(Action::INDEX, Action::NEW, Action::DELETE);
+        }
+
+        return $actions;
+    }
+
+    public function index(AdminContext $context)
+    {
+        $user = $this->getUser();
+
+        if ($user && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            throw new AccessDeniedException('Vous n\'avez pas accès à cette section.');
+        }
+
+        return parent::index($context);
+    }
+    
+    
 }
