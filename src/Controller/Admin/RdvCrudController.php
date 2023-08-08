@@ -7,6 +7,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -24,12 +26,10 @@ use Symfony\Component\Security\Core\Security;
 class RdvCrudController extends AbstractCrudController
 {
     private $security;
-    private $entityManager;
 
-    public function __construct(Security $security, EntityManagerInterface $entityManager)
+    public function __construct(Security $security)
     {
         $this->security = $security;
-        $this->entityManager = $entityManager;
     }
 
     public static function getEntityFqcn(): string
@@ -40,30 +40,35 @@ class RdvCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+        ->setDefaultSort(['dateRdv' => 'ASC'])
         // the labels used to refer to this entity in titles, buttons, etc.
         ->setEntityLabelInSingular('Rendez-vous')
         ->setEntityLabelInPlural('Rendez-vous');
         // ->setEntityPermission('ROLE_EDITOR');
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            // ->add(Crud::PAGE_EDIT, Action::SAVE_AND_ADD_ANOTHER)
+        ;
+    }
+    
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
 
-        $user = $this->getUser();
+        $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+        $user = $this->security->getUser();
 
-        if($this->isGranted('ROLE_ADMIN')){
-            $queryBuilder = $this->entityManager->createQueryBuilder()
-            ->select('rdv')
-            ->from(Rdv::class, 'rdv');
-            return $queryBuilder;
+        if (!$user) {        
+            throw new \Exception('You must be logged in to access this section.');
         }
 
-        $queryBuilder = $this->entityManager->createQueryBuilder()
-            ->select('rdv')
-            ->from(Rdv::class, 'rdv')
-            ->where('rdv.commercial = :user')
-            ->setParameter('user', $user);
-
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_USER', $user->getRoles())) {
+            $queryBuilder->andWhere('entity.commercial = :user');
+            $queryBuilder->setParameter('user', $user);
+        }
         return $queryBuilder;
     }
     
