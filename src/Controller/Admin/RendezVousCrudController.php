@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use App\Entity\RendezVous;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -14,6 +16,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use phpDocumentor\Reflection\Types\Void_;
 use Symfony\Component\Security\Core\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 class RendezVousCrudController extends AbstractCrudController
 {
     private $security;
@@ -34,19 +40,64 @@ class RendezVousCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('id')->hideOnForm(),
-            //IdField::new('IdUser')->hideOnForm(),
-            TextField::new('NomEnseigne'),
-            TextField::new('Ville'),
-            NumberField::new('CodePostal'),
-            TextField::new('ContactNom'),
-            TelephoneField::new('ContactNumero'),
-            DateTimeField::new('DateRdv'),
-            DateTimeField::new('DateCreation')->hideOnForm(),
-            DateTimeField::new('DateUpdate')->hideOnForm(),
-            AssociationField::new('commercial'), // note the change in case here
-        ];
+        
+        $user = $this->security->getUser();
+        if ($user && in_array('ROLE_ADMIN', $user->getRoles())) {
+            return [
+                IdField::new('id')->hideOnForm()->hideOnDetail()->hideOnIndex(),
+                //IdField::new('IdUser')->hideOnForm(),
+                TextField::new('NomEnseigne'),
+                TextField::new('Ville'),
+                NumberField::new('CodePostal'),
+                TextField::new('adresse'),
+                TextField::new('ContactNom'),
+                TelephoneField::new('ContactNumero'),
+                DateTimeField::new('DateRdv'),
+                DateTimeField::new('DateCreation')->hideOnForm(),
+                DateTimeField::new('DateUpdate')->hideOnForm(),
+                AssociationField::new('commercial'), 
+            ];
+
+        }else{
+            return [
+                IdField::new('id')->hideOnForm(),
+                //IdField::new('IdUser')->hideOnForm(),
+                TextField::new('NomEnseigne'),
+                TextField::new('Ville'),
+                NumberField::new('CodePostal'),
+                TextField::new('adresse'),
+                TextField::new('ContactNom'),
+                TelephoneField::new('ContactNumero'),
+                DateTimeField::new('DateRdv'),
+                DateTimeField::new('DateCreation')->hideOnForm(),
+                DateTimeField::new('DateUpdate')->hideOnForm(),
+                AssociationField::new('commercial')->hideOnDetail()->hideOnForm(),
+            ];
+        }
+        
+        
+    }
+    public function createIndexQueryBuilder(
+        SearchDto $searchDto,
+        EntityDto $entityDto,
+        FieldCollection $fields,
+        FilterCollection $filters
+    ): QueryBuilder {
+        $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+
+        $user = $this->security->getUser();
+
+        if (!$user) {
+            
+            throw new \Exception('You must be logged in to access this section.');
+        }
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_USER', $user->getRoles())) {
+            $queryBuilder->andWhere('entity.commercial = :user');
+            $queryBuilder->setParameter('user', $user);
+        }
+
+        return $queryBuilder;
     }
     
     public function persistEntity(EntityManagerInterface $em, $entityInstance) : void

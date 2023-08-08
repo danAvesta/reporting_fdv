@@ -11,7 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -38,7 +38,7 @@ class UserCrudController extends AbstractCrudController
             TextField::new('Nom'),
             TextField::new('Prenom'),
             EmailField::new('email'),
-            TextField::new('password','Mot de passe')->hideWhenUpdating()->hideOnIndex()->hideOnDetail(),
+            TextField::new('password', 'Mot de passe')->hideOnIndex()->hideOnDetail()->hideWhenUpdating()->setFormType(PasswordType::class),
             ArrayField::new('roles'),
         ];
     }

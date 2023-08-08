@@ -45,6 +45,10 @@ class RendezVous
     #[ORM\JoinColumn(nullable: false)]
     private ?User $commercial = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $adresse = null;
+
+   
 
     
 
@@ -161,6 +165,20 @@ class RendezVous
 
         return $this;
     }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(string $adresse): static
+    {
+        $this->adresse = $adresse;
+
+        return $this;
+    }
+
+   
     
 
 
