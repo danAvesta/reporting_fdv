@@ -14,4 +14,4 @@ import './bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
-import "~animate.css";
+//import "~animate.css";

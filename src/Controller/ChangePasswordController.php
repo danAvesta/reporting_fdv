@@ -3,12 +3,15 @@
 namespace App\Controller;
 
 use App\Form\ChangePasswordType;
+use ErrorException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Twig\Error\Error;
 
 
 
@@ -17,7 +20,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ChangePasswordController extends AbstractController
 {
-    #[Route("/change-password", name:"change_password")]
+    #[Route("/change-password", name:"change-password")]
     public function changePassword(Request $request, UserPasswordHasherInterface $passwordEncoder, EntityManagerInterface $entityManager)
     {
         $user = $this->getUser();
@@ -30,13 +33,15 @@ class ChangePasswordController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$passwordEncoder->isPasswordValid($user, $form->get('oldPassword')->getData())) {
-                // Handle error
+
+                return $this->render('user/change_password.html.twig', ['form' => $form->createView(),"erreur"=>"Mot de passe invalide"]);
+                
             } else {
                 $newPassword = $passwordEncoder->hashPassword($user, $form->get('newPassword')->getData());
                 $user->setPassword($newPassword);
                 $entityManager->persist($user);
                 $entityManager->flush();
-                // Redirect or add a success message
+                return $this->redirectToRoute('admin');
             }
         }
 
