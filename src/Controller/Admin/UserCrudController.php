@@ -91,12 +91,36 @@ class UserCrudController extends AbstractCrudController
     public function index(AdminContext $context)
     {
         $user = $this->getUser();
+       
 
-        if ($user && !in_array('ROLE_ADMIN', $user->getRoles())) {
+        if (!in_array('ROLE_ADMIN', $user->getRoles())) {
             throw new AccessDeniedException('Vous n\'avez pas accès à cette section.');
         }
 
         return parent::index($context);
+    }
+    public function detail(AdminContext $context)
+    {
+        $user = $this->getUser();
+        $requestedId = $context->getEntity()->getInstance()->getId();
+
+        // Si ce n'est pas un admin et qu'il tente d'accéder à un autre profil
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && $user->getId() !== $requestedId) {
+            throw new AccessDeniedException('Vous n\'avez pas accès à cette section.');
+        }
+
+        return parent::detail($context);
+    }
+    public function edit(AdminContext $context)
+    {
+        $user = $this->getUser();
+        $requestedUserId = $context->getEntity()->getPrimaryKeyValue();
+
+        if ($user && $user->getId() !== $requestedUserId) {
+            throw new AccessDeniedException('Vous n\'avez pas accès à cette section.');
+        }
+
+        return parent::edit($context);
     }
     
     
