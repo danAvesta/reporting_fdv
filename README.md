@@ -1,9 +1,9 @@
 # reporting_fdv
 
 User:
-  - config profil (changement de mot de passe, changement de nom/prenom)
+  - config profil (~~changement de mot de passe~~, changement de nom/prenom)
   - faire la modification des roles
-  - faire page login
+  - ~~faire page login~~
 
 Rdv:
   - ~~voir que les rdv concernant le commercial connecté~~
