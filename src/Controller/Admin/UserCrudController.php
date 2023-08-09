@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -50,7 +51,9 @@ class UserCrudController extends AbstractCrudController
                 TextField::new('Prenom'),
                 EmailField::new('email'),
                 TextField::new('password', 'Mot de passe')->hideOnIndex()->hideOnDetail()->hideWhenUpdating()->setFormType(PasswordType::class),
-                ArrayField::new('roles'),
+                ChoiceField::new('roles')
+                    ->setChoices(['ROLE_USER'=>'ROLE_USER','ROLE_ADMIN'=>'ROLE_ADMIN','ROLE_MANAGER'=>'ROLE_MANAGER'])
+                    ->allowMultipleChoices()
             ];
         }else{
             return [

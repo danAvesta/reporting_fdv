@@ -4,6 +4,6 @@ controllers:
 app_login:
     path: /login
     controller: App\Controller\SecurityController::login
-change-password:
-    path: /change-password
-    controller: App\Controller\ChangePasswordController::changePassword
+# change-password:
+#     path: /change-password
+#     controller: App\Controller\ChangePasswordController::changePassword
