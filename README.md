@@ -4,10 +4,16 @@ User:
   - config profil (~~changement de mot de passe~~, changement de nom/prenom)
   - faire la modification des roles
   - ~~faire page login~~
+  - reset-password
 
 Rdv:
   - ~~voir que les rdv concernant le commercial connecté~~
   - trier les rdv par date de rdv
+
+Rapport:
+
+Statistique:
+  - nombre de rdv par commercial
 
 
 
