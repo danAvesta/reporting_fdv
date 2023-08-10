@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -43,7 +44,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $Prenom = null;
 
     #[ORM\Column(type: 'string', length: 100)]
+
     private $resetToken;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $ResetTokenExpiresAt = null;
+
+
     public function __construct()
     {
         $this->rendezVouses = new ArrayCollection();
@@ -188,4 +195,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getResetTokenExpiresAt(): ?\DateTimeInterface
+    {
+        return $this->ResetTokenExpiresAt;
+    }
+    
+    public function setResetTokenExpiresAt(?\DateTimeInterface $datetime): self
+    {
+        $this->ResetTokenExpiresAt = $datetime;
+        return $this;
+    }
+
 }

@@ -63,6 +63,11 @@ class SecurityController extends AbstractDashboardController
                 // On génère un token de réinitialisation
                 $token = $tokenGenerator->generateToken();
                 $user->setResetToken($token);
+
+                // Set the expiration date for 15 minutes from now
+                $expiresAt = new \DateTime('+15 minutes');
+                $user->setResetTokenExpiresAt($expiresAt);
+
                 $entityManager->persist($user);
                 $entityManager->flush();
 
@@ -83,7 +88,7 @@ class SecurityController extends AbstractDashboardController
             }
             
             // $user est null
-            $this->addFlash('danger', 'Un problème est survenu');
+            $this->addFlash('danger', 'Aucun compte avec ce mail');
             return $this->redirectToRoute('app_login');
         }
 
@@ -100,10 +105,25 @@ class SecurityController extends AbstractDashboardController
         UserPasswordHasherInterface $passwordHasher
     ): Response
     {
-        // On vérifie si on a ce token dans la base
+        
         $user = $usersRepository->findOneByResetToken($token);
         
+        
         // On vérifie si l'utilisateur existe
+
+        $user = $usersRepository->findOneByResetToken($token);
+
+        if (!$user) {
+            $this->addFlash('danger', 'Votre demande a expiré ou le jeton est invalide.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        $now = new \DateTime();
+        if ($user->getResetTokenExpiresAt() <= $now) {
+            $this->addFlash('danger', 'Votre demande de réinitialisation a expiré. Veuillez demander à nouveau.');
+            return $this->redirectToRoute('app_login');
+        }
+
 
         if($user){
             $form = $this->createForm(ResetPasswordFormType::class);
