@@ -39,14 +39,16 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Page d\'accueil', 'fa fa-home');
-        yield MenuItem::linkToCrud('Ajouter un Rendez Vous', 'fas fa-plus', RendezVous::class)->setAction(Crud::PAGE_NEW);
-        
+        if ($this->isGranted("ROLE_MANAGER")){
+            yield MenuItem::section('Administration');                
+            yield MenuItem::linkToCrud('Liste des User', 'fas fa-eye', User::class)->setAction(Crud::PAGE_INDEX);
+
+            
+        }
         if ($this->isGranted("ROLE_ADMIN")){
-            yield MenuItem::section('Administration');
-            yield MenuItem::subMenu('User', 'fas fa-bars')->setSubItems([
-                MenuItem::linkToCrud('Ajouter un User', 'fas fa-plus', User::class)->setAction(Crud::PAGE_NEW),
-                MenuItem::linkToCrud('Liste des User', 'fas fa-eye', User::class)
-            ]);
+            yield MenuItem::section('Administration');                
+            yield MenuItem::linkToCrud('Liste des User', 'fas fa-eye', User::class)->setAction(Crud::PAGE_INDEX);
+
             
         }
         

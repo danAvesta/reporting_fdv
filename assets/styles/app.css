@@ -1,3 +1,37 @@
+
+
+
 body {
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255); /* Couleur par défaut pour le thème clair */
 }
+
+/* Thème clair pour la div de connexion */
+.card {
+    background-color: rgb(255, 255, 255); /* Fond blanc */
+    color: rgb(0, 0, 0); /* Texte noir */
+    /* Ajoutez d'autres styles si nécessaire */
+}
+
+/* Cacher le menu d'EasyAdmin */
+.sidebar {
+    display: none;
+}
+.responsive-header #responsive-header-logo a{
+    display: none;
+}
+.fa-bars:before, .fa-navicon:before{
+    display: none;
+}
+
+
+/* Styles pour le thème sombre */
+body.ea-dark-scheme {
+    background-color: rgb(34, 34, 34); /* Fond sombre */
+}
+
+body.ea-dark-scheme .card {
+    background-color: rgb(44, 44, 44); /* Fond légèrement plus clair que le fond général */
+    color: rgb(220, 220, 220); /* Texte clair */
+    /* Ajoutez d'autres styles si nécessaire */
+}
+
