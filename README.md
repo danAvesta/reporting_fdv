@@ -4,7 +4,7 @@ User:
   - config profil (~~changement de mot de passe~~, changement de nom/prenom)
   - faire la modification des roles
   - ~~faire page login~~
-  - reset-password
+  - ~~reset-password~~
 
 Rdv:
   - ~~voir que les rdv concernant le commercial connecté~~
