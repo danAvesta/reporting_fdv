@@ -132,8 +132,8 @@ class SecurityController extends AbstractDashboardController
 
             if($form->isSubmitted() && $form->isValid()){
                 // On efface le token
-                $user->setResetToken('');
-                
+                $user->setResetToken(null);
+                $user->setResetTokenExpiresAt(null);
                 
 // On enregistre le nouveau mot de passe en le hashant
                 $user->setPassword(

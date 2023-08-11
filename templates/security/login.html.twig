@@ -1,7 +1,8 @@
 {% extends '@!EasyAdmin/layout.html.twig' %}
 {% block head_stylesheets %}
-    {{ parent() }}
+   
     {{ encore_entry_link_tags('app') }} {# "app" est le nom de votre point d'entrée, qui correspond généralement à "app.js" #}
+     {{ parent() }}
 {% endblock %}
 
 {% block title %}Log in!{% endblock %}
@@ -40,7 +41,7 @@
                     <div class="text-center mt-4">
                         <button class="btn btn-lg btn-primary animate__animated animate__pulse animate__infinite" type="submit">Se connecter</button>
                         <div class="mt-3">
-                            <a href="{{ path('forgotten_password') }}" class="btn btn-secondary mt-3">Mot de passe oublié</a>
+                            <a href="{{ path('forgotten_password') }}" class="btn btn-secondary mt-3">Mot de passe oublié ?</a>
                         </div>
                     </div>
                 </form>

@@ -24,6 +24,7 @@ body {
 }
 
 
+
 /* Styles pour le thème sombre */
 body.ea-dark-scheme {
     background-color: rgb(34, 34, 34); /* Fond sombre */
@@ -35,3 +36,23 @@ body.ea-dark-scheme .card {
     /* Ajoutez d'autres styles si nécessaire */
 }
 
+.password-reset-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.password-reset-container h1 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#emailError {
+    margin-top: 5px;
+}
+body.ea-dark-scheme .form-control{
+    color: black ;
+}
