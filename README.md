@@ -9,6 +9,7 @@ User:
 Rdv:
   - ~~voir que les rdv concernant le commercial connecté~~
   - ~~trier les rdv par date de rdv~~
+  - gerer les statuts
 
 Rapport:
   - faire le crud pour les rapport rataché aux rdv
