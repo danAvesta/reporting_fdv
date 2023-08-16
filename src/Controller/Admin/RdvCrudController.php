@@ -65,7 +65,7 @@ class RdvCrudController extends AbstractCrudController
             throw new \Exception('You must be logged in to access this section.');
         }
 
-        if (!in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_USER', $user->getRoles())) {
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && !in_array('ROLE_MANAGER', $user->getRoles())) {
             $queryBuilder->andWhere('entity.commercial = :user');
             $queryBuilder->setParameter('user', $user);
         }
@@ -83,7 +83,7 @@ class RdvCrudController extends AbstractCrudController
         yield TextField::new('adresseMagasin');
         yield TextField::new('codePostal');
 
-        if($this->isGranted('ROLE_ADMIN')){
+        if($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_MANAGER')){
             yield AssociationField::new('commercial')->autocomplete();
         }
         yield DateTimeField::new('createDate')->hideOnForm();

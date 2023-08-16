@@ -1,0 +1,43 @@
+{% extends '@!EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Changer le mot de passe{% endblock %}
+
+{% block main %}
+<div class="">
+    {# <h1 class="mb-4 text-center">Changer le mot de passe</h1> #}
+    {% if erreur is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ erreur }}
+        </div>
+
+    {% endif %}
+    <div class="row justify-content">
+        <div class="col-lg-6">
+            <form method="post" action="{{ path('admin', {'routeName': 'change-password'}) }}" class="needs-validation" novalidate>
+                {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_label(form.oldPassword, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.oldPassword, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.oldPassword, {'attr': {'class': 'invalid-feedback'}}) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.newPassword, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.newPassword, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.newPassword, {'attr': {'class': 'invalid-feedback'}}) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.newPasswordConfirmation, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.newPasswordConfirmation, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.newPasswordConfirmation, {'attr': {'class': 'invalid-feedback'}}) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Changer le mot de passe</button>
+                {{ form_end(form) }}
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

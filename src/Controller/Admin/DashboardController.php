@@ -73,6 +73,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Mon profil', 'fa fa-id-card', User::class)
             ->setAction('detail')
             ->setEntityId($userId),
+            MenuItem::linkToRoute('Change mot de passe', 'fa fa-key', 'app_change_password'),
         ]);
     }
 }

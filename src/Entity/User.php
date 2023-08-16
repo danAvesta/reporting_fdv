@@ -41,6 +41,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $prenom = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $ResetTokenExpiresAt = null;
+
     public function __construct()
     {
         $this->rdvs = new ArrayCollection();
@@ -174,5 +180,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // return the property you want to show
         return ucfirst($this->prenom) .' ' . ucfirst($this->nom);
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): static
+    {
+        $this->resetToken = $resetToken;
+
+        return $this;
+    }
+
+    public function getResetTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->ResetTokenExpiresAt;
+    }
+
+    public function setResetTokenExpiresAt(?\DateTimeImmutable $ResetTokenExpiresAt): static
+    {
+        $this->ResetTokenExpiresAt = $ResetTokenExpiresAt;
+
+        return $this;
     }
 }
