@@ -48,10 +48,8 @@ class DashboardController extends AbstractDashboardController
         }
         if ($this->isGranted("ROLE_ADMIN")){
             yield MenuItem::section('Administration');                
-            yield MenuItem::linkToCrud('Liste des User', 'fas fa-eye', User::class)->setAction(Crud::PAGE_INDEX); 
+            yield MenuItem::linkToCrud('Liste des User', 'fas fa-user', User::class)->setAction(Crud::PAGE_INDEX); 
         }
-                       
-        yield MenuItem::linkToCrud('Formulaire', 'fas fa-eye', Formulairerdv::class)->setAction(Crud::PAGE_INDEX);
         
     }
     

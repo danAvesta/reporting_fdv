@@ -53,6 +53,9 @@ class Formulairerdv
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $RemarqueEnPlus = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $DisplayNon = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -210,6 +213,18 @@ class Formulairerdv
     public function setRemarqueEnPlus(?string $RemarqueEnPlus): static
     {
         $this->RemarqueEnPlus = $RemarqueEnPlus;
+
+        return $this;
+    }
+
+    public function getDisplayNon(): ?string
+    {
+        return $this->DisplayNon;
+    }
+
+    public function setDisplayNon(?string $DisplayNon): static
+    {
+        $this->DisplayNon = $DisplayNon;
 
         return $this;
     }

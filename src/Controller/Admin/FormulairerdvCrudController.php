@@ -35,17 +35,47 @@ class FormulairerdvCrudController extends AbstractCrudController
         return [
             
             IdField::new('id')->hideOnForm(),
-            IntegerField::new('TailleMagasin'),
+            ChoiceField::new('TailleMagasin')
+                    ->setChoices([1=>1,2=>2,3=>3,4=>4,5=>5]),
+                    
+            ChoiceField::new('Marque')
+                    ->setChoices(['NEXTBASE'=>'NEXTBASE','JABRA'=>'JABRA','BELKIN'=>'BELKIN']),
+                    
+
             AssociationField::new('Idrdv', 'Rendez-Vous Associé')->hideOnForm(),
-            TextField::new('Marque'),
-            TextField::new('Display'),
+           
+            ChoiceField::new('Display')
+                    ->setChoices(['OUI'=>'OUI','NON'=>'NON']),
+            ChoiceField::new('DisplayNon', 'Si c\'est non')
+                    ->setChoices(['En magasin'=>'En magasin','N’en dispose
+                    pas'=>'N’en dispose
+                    pas','Ne sait pas'=>'Ne sait pas','Non installé'=>'Non installé','Retiré'=>'Retiré','Pas présent'=>'Pas présent','Incomplet'=>'Incomplet','Autre'=>'Autre']),
+
+            
+    
+            ChoiceField::new('Plv', 'PLV')
+                    ->setChoices(['OUI'=>'OUI','NON'=>'NON']),
+
+            ChoiceField::new('MotifDeNonPresence', 'Si c\'est non')
+                    ->setChoices(['Manque de place'=>'Manque de place','Produit non référencé
+                    '=>'Produit non référencé','Refus du magasin'=>'Refus du magasin','Rupture de produit'=>'Rupture de produit','Autre'=>'Autre']),
+
+            
+            TextField::new('DemandeDinstalationPlv', 'Demande d\'Installation PLV'),
+
+            ChoiceField::new('DemandeDinstalationPlv', 'Demande d\'Installation PLV')
+                    ->setChoices(['OUI'=>'OUI','NON'=>'NON']),
+
+            
+            ChoiceField::new('FichePromo', 'Fiche Promo')
+                    ->setChoices(['OUI'=>'OUI','NON'=>'NON']),
+
+
+            ChoiceField::new('RaisonNonPresenceFichePromo', 'Si c\'est non')
+                    ->setChoices(['Manque de place'=>'Manque de place','Refus du magasin'=>'Refus du magasin','Rupture de produit'=>'Rupture de produit','Produit non référencé'=>'Produit non référencé','Autre raison'=>'Autre raison']),
+
             TextField::new('Reference', 'Référence'),
             TextField::new('Quantite', 'Quantité'),
-            TextField::new('Plv', 'PLV'),
-            TextField::new('MotifDeNonPresence', 'Motif de Non Présence'),
-            TextField::new('DemandeDinstalationPlv', 'Demande d\'Installation PLV'),
-            TextField::new('FichePromo', 'Fiche Promo'),
-            TextField::new('RaisonNonPresenceFichePromo', 'Raison Non Présence Fiche Promo'),
             IntegerField::new('RessentiDeLaVisite', 'Ressenti de la Visite'),
             TextareaField::new('RemarqueEnPlus', 'Remarque en Plus'),
         ];
