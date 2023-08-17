@@ -1,7 +1,7 @@
 # reporting_fdv
 
 User:
-  - config profil (~~changement de mot de passe, changement de nom/prenom~~)
+  - ~~config profil (changement de mot de passe, changement de nom/prenom)~~
   - ~~faire la modification des roles~~
   - ~~faire page login~~
   - ~~reset-password~~
@@ -9,7 +9,7 @@ User:
 Rdv:
   - ~~voir que les rdv concernant le commercial connecté~~
   - ~~trier les rdv par date de rdv~~
-  - gerer les statuts
+  - ~~gerer les statuts~~
 
 Rapport:
   - faire le crud pour les rapport rataché aux rdv
@@ -19,5 +19,5 @@ Statistique:
   - nombre de rdv par commercial
 
 Optionnel:
-  - fonction ajout dans outlook ou calendrier du tel
+  - ~~fonction ajout dans outlook ou calendrier du tel~~
   - faire un afichage planning sur l'accueil
