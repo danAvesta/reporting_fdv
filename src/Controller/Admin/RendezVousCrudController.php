@@ -2,10 +2,12 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Formulairerdv;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use App\Entity\RendezVous;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use phpDocumentor\Reflection\Types\Void_;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -25,6 +28,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use App\Form\RendezVousFormType;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use EasyCorp\Bundle\EasyAdminBundle\Router\CrudUrlGenerator;
 class RendezVousCrudController extends AbstractCrudController
 {
     private $security;
@@ -123,32 +128,28 @@ class RendezVousCrudController extends AbstractCrudController
         parent::persistEntity($em, $entityInstance);
     }
     public function configureActions(Actions $actions): Actions
-{
-    $openForm = Action::new('OpenForm', 'Formulaire de Rendez-Vous', 'fa fa-file-alt')
-        ->linkToCrudAction('openForm')
-        ->addCssClass('btn btn-primary');
+    {
+    $newFormAction = Action::new('NouveauFormulaire','NouveauFormulaire')
+        ->linkToCrudAction('NouveauFormulaire')
+        ->setCssClass('btn btn-primary')
+        ->displayAsLink()
+        ->addCssClass('text-nowrap');
 
     return $actions
-        ->add(Crud::PAGE_INDEX, $openForm);
-}
-public function openForm(Request $request, RendezVous $rendezVous)
-{
-    $form = $this->createForm(RendezVousFormType::class, $rendezVous);
-    
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-     
-
-        $this->getDoctrine()->getManager()->flush();
-
-        return $this->redirectToRoute('....');
+        ->add(Crud::PAGE_INDEX, $newFormAction);
     }
 
-    return $this->render('.....html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
+
+    public function NouveauFormulaire(AdminContext $context): Response
+    {
+        $rendezvousId = $context->getEntity()->getPrimaryKeyValue();
+        return $this->redirectToRoute('admin', [
+            'crudAction' => 'new',
+            'crudControllerFqcn' => FormulairerdvCrudController::class,
+            'rendezvousId' => $rendezvousId,
+        ]);
+    }
+
 
     
 }

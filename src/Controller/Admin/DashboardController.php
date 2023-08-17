@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Formulairerdv;
 use App\Entity\RendezVous;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -47,10 +48,10 @@ class DashboardController extends AbstractDashboardController
         }
         if ($this->isGranted("ROLE_ADMIN")){
             yield MenuItem::section('Administration');                
-            yield MenuItem::linkToCrud('Liste des User', 'fas fa-eye', User::class)->setAction(Crud::PAGE_INDEX);
-
-            
+            yield MenuItem::linkToCrud('Liste des User', 'fas fa-eye', User::class)->setAction(Crud::PAGE_INDEX); 
         }
+                       
+        yield MenuItem::linkToCrud('Formulaire', 'fas fa-eye', Formulairerdv::class)->setAction(Crud::PAGE_INDEX);
         
     }
     

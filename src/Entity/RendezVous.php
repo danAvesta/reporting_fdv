@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\RendezVousRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -47,6 +49,14 @@ class RendezVous
 
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
+
+    #[ORM\OneToMany(mappedBy: 'Idrdv', targetEntity: Formulairerdv::class)]
+    private Collection $formulairerdvs;
+
+    public function __construct()
+    {
+        $this->formulairerdvs = new ArrayCollection();
+    }
 
    
 
@@ -174,6 +184,36 @@ class RendezVous
     public function setAdresse(string $adresse): static
     {
         $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Formulairerdv>
+     */
+    public function getFormulairerdvs(): Collection
+    {
+        return $this->formulairerdvs;
+    }
+
+    public function addFormulairerdv(Formulairerdv $formulairerdv): static
+    {
+        if (!$this->formulairerdvs->contains($formulairerdv)) {
+            $this->formulairerdvs->add($formulairerdv);
+            $formulairerdv->setIdrdv($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormulairerdv(Formulairerdv $formulairerdv): static
+    {
+        if ($this->formulairerdvs->removeElement($formulairerdv)) {
+            // set the owning side to null (unless already changed)
+            if ($formulairerdv->getIdrdv() === $this) {
+                $formulairerdv->setIdrdv(null);
+            }
+        }
 
         return $this;
     }
