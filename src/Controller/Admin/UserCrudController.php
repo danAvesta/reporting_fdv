@@ -90,7 +90,7 @@ class UserCrudController extends AbstractCrudController
         $user = $this->getUser();
         $requestedUserId = $context->getEntity()->getPrimaryKeyValue();
 
-        if ($user && $user->getId() !== $requestedUserId) {
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && $user->getId() !== $requestedUserId) {
             throw new AccessDeniedException('Vous n\'avez pas accès à cette section.');
         }
 
