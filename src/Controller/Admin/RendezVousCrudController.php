@@ -19,7 +19,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use phpDocumentor\Reflection\Types\Void_;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -33,10 +35,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\CrudUrlGenerator;
 class RendezVousCrudController extends AbstractCrudController
 {
     private $security;
+    private $mailer;
 
-    public function __construct(Security $security)
+    public function __construct(Security $security, MailerInterface $mailer)
     {
         $this->security = $security;
+        $this->mailer = $mailer;
     }
     
 
@@ -87,6 +91,78 @@ class RendezVousCrudController extends AbstractCrudController
         
         
     }
+    public function addCalendar(AdminContext $context): Response
+    {
+        $entity = $context->getEntity()->getInstance();
+        
+        $icsContent = $this->generateIcsContent($entity);
+        $response = new Response($icsContent);
+        $response->headers->set('Content-Type', 'text/calendar');
+        $response->headers->set('Content-Disposition', 'attachment; filename="rdv_'.$entity->getNomEnseigne().'.ics"');
+
+        $user=$this->security->getUser()->getEmail();
+
+        $email = (new TemplatedEmail())
+            ->from('informatique@avesta.fr')
+            ->to($user)
+            ->subject('Reporting FDV: nouvel evenement')
+            ->text("Bonjour,\r\nVoici le fichier ICS pour le rdv avec le magasin ".$entity->getNomEnseigne().".")
+            ->attach($icsContent, 'rdv_avesta.ics', 'text/calendar');
+        
+            $this->mailer->send($email);
+
+        return $response;
+
+    }
+
+    private function generateIcsContent($entity)
+    {
+        $datefin = $entity->getDateRdv()->format('Ymd\THis');
+        $dateFin = \DateTime::createFromFormat('Ymd\THis',$datefin);
+        $dateFin->modify('+30 minutes');
+        $datefin=$dateFin->format('Ymd\THis');
+
+        $icsContent = "BEGIN:VCALENDAR\r\n";
+        $icsContent .= "METHOD:PUBLISH\r\n";
+        $icsContent .= "PRODID:Microsoft Exchange Server 2010\r\n";
+        $icsContent .= "VERSION:2.0\r\n";
+        $icsContent .= "BEGIN:VTIMEZONE\r\n";
+        $icsContent .= "TZID:Romance Standard Time\r\n";
+        $icsContent .= "BEGIN:STANDARD\r\n";
+        $icsContent .= "DTSTART:20190306T150000Z\r\n";
+        $icsContent .= "TZOFFSETFROM:+0200\r\n";
+        $icsContent .= "TZOFFSETTO:+0100\r\n";
+        $icsContent .= "RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10\r\n";
+        $icsContent .= "END:STANDARD\r\n";
+        $icsContent .= "BEGIN:DAYLIGHT\r\n";
+        $icsContent .= "DTSTART:16010101T020000\r\n";
+        $icsContent .= "TZOFFSETFROM:+0100\r\n";
+        $icsContent .= "TZOFFSETTO:+0200\r\n";
+        $icsContent .= "RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3\r\n";
+        $icsContent .= "END:DAYLIGHT\r\n";
+        $icsContent .= "END:VTIMEZONE\r\n";
+        $icsContent .= "BEGIN:VEVENT\r\n";
+        $icsContent .= "DESCRIPTION;LANGUAGE=fr-FR:Rendez vous avec " . $entity->getContactNom() . " " . $entity->getContactNumero() . "\r\n";
+        $icsContent .= "UID:". md5($entity->getNomEnseigne()) ."\r\n";
+        $icsContent .= "SUMMARY;LANGUAGE=fr-FR:Rendez vous " . $entity->getNomEnseigne(). "\r\n";
+        $icsContent .= "DTSTART;TZID=Romance Standard Time:".$entity->getDateRdv()->format('Ymd\THis')."\r\n";
+        $icsContent .= "DTEND;TZID=Romance Standard Time:".$datefin ."\r\n";
+        $icsContent .= "CLASS:PUBLIC\r\n";
+        $icsContent .= "PRIORITY:5\r\n";
+        $icsContent .= "TRANSP:OPAQUE\r\n";
+        $icsContent .= "STATUS:CONFIRMED\r\n";
+        $icsContent .= "SEQUENCE:1\r\n";
+        $icsContent .= "LOCATION:". $entity->getAdresse() . " " . $entity->getCodePostal() ."\r\n";
+        $icsContent .= "BEGIN:VALARM\r\n";
+        $icsContent .= "DESCRIPTION:REMINDER\r\n";
+        $icsContent .= "TRIGGER;RELATED=START:-PT30M\r\n";
+        $icsContent .= "ACTION:DISPLAY\r\n";
+        $icsContent .= "END:VALARM\r\n";
+        $icsContent .= "END:VEVENT\r\n";
+        $icsContent .= "END:VCALENDAR";
+
+        return $icsContent;
+    }
     public function createIndexQueryBuilder(
         SearchDto $searchDto,
         EntityDto $entityDto,
@@ -129,15 +205,24 @@ class RendezVousCrudController extends AbstractCrudController
     }
     public function configureActions(Actions $actions): Actions
     {
-    $newFormAction = Action::new('NouveauFormulaire','NouveauFormulaire')
-        ->linkToCrudAction('NouveauFormulaire')
-        ->setCssClass('btn btn-primary')
-        ->displayAsLink()
-        ->addCssClass('text-nowrap');
+    $addCalendar = Action::new('addCalendar', 'Ajouter au calendrier')
+    ->linkToCrudAction('addCalendar');
+
+    $newFormAction = Action::new('NouveauFormulaire','Formulaire Reporting')
+        ->linkToCrudAction('NouveauFormulaire');
+
+    $InventaireFormAction = Action::new('InventaireFormulaire','Inventaire Formulaire')
+        ->linkToCrudAction('InventaireFormulaire');    
+      
 
     return $actions
-        ->add(Crud::PAGE_INDEX, $newFormAction);
+        ->add(Crud::PAGE_INDEX, $addCalendar)
+        ->add(Crud::PAGE_INDEX, $newFormAction)
+        ->add(Crud::PAGE_INDEX, $InventaireFormAction)
+        ->add(Crud::PAGE_INDEX, Action::DETAIL);
+        
     }
+    
 
 
     public function NouveauFormulaire(AdminContext $context): Response
@@ -146,6 +231,15 @@ class RendezVousCrudController extends AbstractCrudController
         return $this->redirectToRoute('admin', [
             'crudAction' => 'new',
             'crudControllerFqcn' => FormulairerdvCrudController::class,
+            'rendezvousId' => $rendezvousId,
+        ]);
+    }
+    public function InventaireFormulaire(AdminContext $context): Response
+    {
+        $rendezvousId = $context->getEntity()->getPrimaryKeyValue();
+        return $this->redirectToRoute('admin', [
+            'crudAction' => 'new',
+            'crudControllerFqcn' => InventairerdvCrudController::class,
             'rendezvousId' => $rendezvousId,
         ]);
     }

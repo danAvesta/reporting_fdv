@@ -73,9 +73,6 @@ class FormulairerdvCrudController extends AbstractCrudController
 
             ChoiceField::new('RaisonNonPresenceFichePromo', 'Si c\'est non')
                     ->setChoices(['Manque de place'=>'Manque de place','Refus du magasin'=>'Refus du magasin','Rupture de produit'=>'Rupture de produit','Produit non référencé'=>'Produit non référencé','Autre raison'=>'Autre raison']),
-
-            TextField::new('Reference', 'Référence'),
-            TextField::new('Quantite', 'Quantité'),
             IntegerField::new('RessentiDeLaVisite', 'Ressenti de la Visite'),
             TextareaField::new('RemarqueEnPlus', 'Remarque en Plus'),
         ];

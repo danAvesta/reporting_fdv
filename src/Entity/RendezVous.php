@@ -53,14 +53,14 @@ class RendezVous
     #[ORM\OneToMany(mappedBy: 'Idrdv', targetEntity: Formulairerdv::class)]
     private Collection $formulairerdvs;
 
+    #[ORM\OneToMany(mappedBy: 'IdRdv', targetEntity: Inventairerdv::class)]
+    private Collection $inventairerdvs;
+
     public function __construct()
     {
         $this->formulairerdvs = new ArrayCollection();
+        $this->inventairerdvs = new ArrayCollection();
     }
-
-   
-
-    
 
     public function getId(): ?int
     {
@@ -212,6 +212,36 @@ class RendezVous
             // set the owning side to null (unless already changed)
             if ($formulairerdv->getIdrdv() === $this) {
                 $formulairerdv->setIdrdv(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Inventairerdv>
+     */
+    public function getInventairerdvs(): Collection
+    {
+        return $this->inventairerdvs;
+    }
+
+    public function addInventairerdv(Inventairerdv $inventairerdv): static
+    {
+        if (!$this->inventairerdvs->contains($inventairerdv)) {
+            $this->inventairerdvs->add($inventairerdv);
+            $inventairerdv->setIdRdv($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInventairerdv(Inventairerdv $inventairerdv): static
+    {
+        if ($this->inventairerdvs->removeElement($inventairerdv)) {
+            // set the owning side to null (unless already changed)
+            if ($inventairerdv->getIdRdv() === $this) {
+                $inventairerdv->setIdRdv(null);
             }
         }
 

@@ -26,12 +26,7 @@ class Formulairerdv
     #[ORM\Column(length: 255)]
     private ?string $Display = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $Reference = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $Quantite = null;
-
+    
     #[ORM\Column(length: 255)]
     private ?string $Plv = null;
 
@@ -105,30 +100,6 @@ class Formulairerdv
     public function setDisplay(string $Display): static
     {
         $this->Display = $Display;
-
-        return $this;
-    }
-
-    public function getReference(): ?string
-    {
-        return $this->Reference;
-    }
-
-    public function setReference(string $Reference): static
-    {
-        $this->Reference = $Reference;
-
-        return $this;
-    }
-
-    public function getQuantite(): ?string
-    {
-        return $this->Quantite;
-    }
-
-    public function setQuantite(string $Quantite): static
-    {
-        $this->Quantite = $Quantite;
 
         return $this;
     }
