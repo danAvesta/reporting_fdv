@@ -208,10 +208,10 @@ class RendezVousCrudController extends AbstractCrudController
     $addCalendar = Action::new('addCalendar', 'Ajouter au calendrier')
     ->linkToCrudAction('addCalendar');
 
-    $newFormAction = Action::new('NouveauFormulaire','Formulaire Reporting')
+    $newFormAction = Action::new('NouveauFormulaire','Nouveau Formulaire Reporting')
         ->linkToCrudAction('NouveauFormulaire');
 
-    $InventaireFormAction = Action::new('InventaireFormulaire','Formulaire Inventaire')
+    $InventaireFormAction = Action::new('InventaireFormulaire','Nouveau Formulaire Inventaire')
         ->linkToCrudAction('InventaireFormulaire');
 
     $InventaireDetail = Action::new('InventaireDetail','Détail Inventaire')

@@ -13,6 +13,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+
 
 class InventairerdvCrudController extends AbstractCrudController
 {
@@ -35,10 +37,12 @@ class InventairerdvCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('reference'),
+            AssociationField::new('Product'),
+
             IntegerField::new('quantite')
         ];
     }
+
 
     public function persistEntity(EntityManagerInterface $em, $entityInstance): void
     {
