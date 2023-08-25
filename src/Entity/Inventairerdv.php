@@ -51,17 +51,17 @@ class Inventairerdv
     //     return $this;
     // }
 
-    public function removeItem(InventoryItem $item): static
-    {
-        if ($this->items->contains($item)) {
-            $this->items->removeElement($item);
-            if ($item->getInventairerdv() === $this) {
-                $item->setInventairerdv(null);
-            }
-        }
+    // public function removeItem(InventoryItem $item): static
+    // {
+    //     if ($this->items->contains($item)) {
+    //         $this->items->removeElement($item);
+    //         if ($item->getInventairerdv() === $this) {
+    //             $item->setInventairerdv(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function getId(): ?int
     {

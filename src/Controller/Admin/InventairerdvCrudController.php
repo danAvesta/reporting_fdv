@@ -57,6 +57,15 @@ class InventairerdvCrudController extends AbstractCrudController
     {
         $request = $this->requestStack->getCurrentRequest();
         $rendezvousId = $request->query->get('rendezvousId');
+
+        if (null === $rendezvousId) {
+            $referrer = $request->query->get('referrer');
+            if ($referrer) {
+                $referrerParts = parse_url($referrer);
+                parse_str($referrerParts['query'] ?? '', $referrerQuery);
+                $rendezvousId = $referrerQuery['rendezvousId'] ?? null;
+            }
+        }
         $rendezvous = null;
 
         if ($rendezvousId) {
@@ -66,6 +75,7 @@ class InventairerdvCrudController extends AbstractCrudController
 
        $entityInstance->setDatetime(new \DateTimeImmutable);
        $entityInstance->setIdRdv($rendezvous);
+       
        parent::persistEntity($em, $entityInstance);
 
     }
@@ -122,8 +132,8 @@ class InventairerdvCrudController extends AbstractCrudController
         return $rdv->getCommercial() == $user; 
     }
 
-    public function configureActions(Actions $actions): Actions 
-    {
-        return $actions->disable(Action::NEW);
-    }
+    // public function configureActions(Actions $actions): Actions 
+    // {
+    //     return $actions->disable(Action::NEW);
+    // }
 }

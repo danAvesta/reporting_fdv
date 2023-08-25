@@ -4,7 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Entity\Formulairerdv;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -13,10 +18,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use Symfony\Component\HttpFoundation\RequestStack;
 use App\Entity\RendezVous;
+use Symfony\Component\Security\Core\Security;
 
 class FormulairerdvCrudController extends AbstractCrudController
 {
     private $entityManager;
+
+    private $security;    
     private $requestStack;
 
     public static function getEntityFqcn(): string
@@ -24,10 +32,63 @@ class FormulairerdvCrudController extends AbstractCrudController
         return Formulairerdv::class;
     }
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, Security $security)
     {
         $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
+        $this->security = $security;
+    }
+
+    public function createIndexQueryBuilder(
+        SearchDto $searchDto,
+        EntityDto $entityDto,
+        FieldCollection $fields,
+        FilterCollection $filters
+    ): QueryBuilder {
+        $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+
+        $user = $this->security->getUser();
+
+        if (!$user) {
+            
+            throw new \Exception('Vous devez être connecté pour accéder à cette section.');
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+        $rendezvousId = $request->query->get('rendezvousId');
+        
+        if($this->isGranted("ROLE_ADMIN")){
+            $queryBuilder->andWhere('entity.Idrdv = :rendezvousId');
+            $queryBuilder->setParameter('rendezvousId', $rendezvousId);
+        }
+        else{
+            $queryBuilder->join('entity.Idrdv', 'rdv');
+            $queryBuilder->andWhere('entity.Idrdv = :rendezvousId');
+            $queryBuilder->setParameter('rendezvousId', $rendezvousId);
+            
+            if (!$this->testoriginerdv($rendezvousId, $user)) {
+                throw new \Exception("Vous n'êtes pas à l'origine de ce rendez-vous."); 
+            }
+        
+            $queryBuilder->andWhere('rdv.commercial = :user');
+            $queryBuilder->setParameter('user', $user);    
+        }
+        
+
+        return $queryBuilder;
+    }
+
+
+    
+    private function testoriginerdv($rendezvousId, $user) {
+        
+        $rdvRepository = $this->entityManager->getRepository(RendezVous::class);
+        $rdv = $rdvRepository->find($rendezvousId);
+
+        if (!$rdv) {
+            return false;
+        }
+        return $rdv->getCommercial() == $user; 
     }
 
     public function configureFields(string $pageName): iterable
