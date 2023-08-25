@@ -212,18 +212,19 @@ class RendezVousCrudController extends AbstractCrudController
         ->linkToCrudAction('NouveauFormulaire');
 
     $InventaireFormAction = Action::new('InventaireFormulaire','Inventaire Formulaire')
-        ->linkToCrudAction('InventaireFormulaire');    
-      
+        ->linkToCrudAction('InventaireFormulaire');
+
+    $InventaireDetail = Action::new('InventaireDetail','Inventaire détail')
+    ->linkToCrudAction('InventaireDetail');
 
     return $actions
         ->add(Crud::PAGE_INDEX, $addCalendar)
         ->add(Crud::PAGE_INDEX, $newFormAction)
         ->add(Crud::PAGE_INDEX, $InventaireFormAction)
+        ->add(Crud::PAGE_INDEX, $InventaireDetail)
         ->add(Crud::PAGE_INDEX, Action::DETAIL);
         
     }
-    
-
 
     public function NouveauFormulaire(AdminContext $context): Response
     {
@@ -244,6 +245,13 @@ class RendezVousCrudController extends AbstractCrudController
         ]);
     }
 
-
-    
+    public function InventaireDetail(AdminContext $context): Response
+    {
+        $rendezvousId = $context->getEntity()->getPrimaryKeyValue();
+        return $this->redirectToRoute('admin',[
+            'crudAction' => 'index',
+            'crudControllerFqcn' => InventairerdvCrudController::class,
+            'rendezvousId' => $rendezvousId,
+        ]);
+    }
 }

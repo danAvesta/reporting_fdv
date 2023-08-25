@@ -28,28 +28,28 @@ class Inventairerdv
     #[ORM\ManyToOne(inversedBy: 'inventairerdvs')]
     private ?RendezVous $IdRdv = null;
 
-    #[ORM\OneToMany(mappedBy: "inventairerdv", targetEntity: InventoryItem::class)]
-    private Collection $items;
+    // #[ORM\OneToMany(mappedBy: "inventairerdv", targetEntity: InventoryItem::class)]
+    // private Collection $items;
 
-    public function __construct()
-    {
-        $this->items = new ArrayCollection();
-    }
+    // public function __construct()
+    // {
+    //     $this->items = new ArrayCollection();
+    // }
 
-    public function getItems(): Collection
-    {
-        return $this->items;
-    }
+    // public function getItems(): Collection
+    // {
+    //     return $this->items;
+    // }
 
-    public function addItem(InventoryItem $item): static
-    {
-        if (!$this->items->contains($item)) {
-            $this->items[] = $item;
-            $item->setInventairerdv($this);
-        }
+    // public function addItem(InventoryItem $item): static
+    // {
+    //     if (!$this->items->contains($item)) {
+    //         $this->items[] = $item;
+    //         $item->setInventairerdv($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function removeItem(InventoryItem $item): static
     {

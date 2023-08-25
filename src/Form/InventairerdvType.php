@@ -1,31 +1,42 @@
 <?php
+
 namespace App\Form;
 
 use App\Entity\Inventairerdv;
+use App\Entity\RendezVous;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+
 
 class InventairerdvType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('items', CollectionType::class, [
-                'entry_type' => InventoryItemType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'label' => 'Items',
+            ->add('Reference', TextType::class, [
+                'label' => 'Référence',
+                'required' => true,
             ])
-            // Si vous avez d'autres champs dans votre entité Inventairerdv, vous pouvez les ajouter ici.
-            // Par exemple :
-            // ->add('Reference')
-            // ->add('Quantite')
-            // ->add('datetime')
-            // ->add('IdRdv')
-        ;
+            ->add('Quantite', IntegerType::class, [
+                'label' => 'Quantité',
+                'required' => true,
+            ])
+            // ->add('datetime', DateTimeType::class, [
+            //     'label' => 'Date et heure',
+            //     'required' => true,
+            // ])
+            // ->add('IdRdv', EntityType::class, [
+            //     'class' => RendezVous::class,
+            //     // 'choice_label' => 'name',
+            //     'label' => 'Rendez-vous',
+            //     'required' => true,
+            // ])
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
