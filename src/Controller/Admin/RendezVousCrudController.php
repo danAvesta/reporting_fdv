@@ -74,7 +74,7 @@ class RendezVousCrudController extends AbstractCrudController
 
         }else{
             return [
-                IdField::new('id')->hideOnForm(),
+                IdField::new('id')->hideOnForm()->hideOnDetail()->hideOnIndex(),
                 //IdField::new('IdUser')->hideOnForm(),
                 TextField::new('NomEnseigne'),
                 TextField::new('Ville'),

@@ -1,22 +1,14 @@
 <?php
+
 namespace App\Controller\Admin;
 
 use App\Entity\Inventairerdv;
-use App\Entity\InventoryItem; // Import the correct class
 use App\Entity\RendezVous;
-use App\Form\InventairerdvType;
 use Doctrine\ORM\EntityManagerInterface;
-
 use Doctrine\ORM\QueryBuilder;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
-// use App\Form\InventoryItemType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,7 +18,6 @@ class InventairerdvCrudController extends AbstractCrudController
 {
     private $requestStack;
     private $security;
-
     private $entityManager;
 
     public function __construct(RequestStack $requestStack, Security $security, EntityManagerInterface $entityManager)
@@ -43,97 +34,76 @@ class InventairerdvCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield TextField::new('reference');
-        yield IntegerField::new('quantite');
         return [
-            // CollectionField::new('')
-            //     ->setEntryType(InventairerdvType::class) // Use the correct form type class
-            //     ->allowAdd()
-            //     ->allowDelete()
+            TextField::new('reference'),
+            IntegerField::new('quantite')
         ];
     }
 
     public function persistEntity(EntityManagerInterface $em, $entityInstance): void
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $rendezvousId = $request->query->get('rendezvousId');
+        $rendezvousId = $this->requestStack->getCurrentRequest()->query->get('rendezvousId');
 
-        if (null === $rendezvousId) {
-            $referrer = $request->query->get('referrer');
-            if ($referrer) {
-                $referrerParts = parse_url($referrer);
-                parse_str($referrerParts['query'] ?? '', $referrerQuery);
-                $rendezvousId = $referrerQuery['rendezvousId'] ?? null;
-            }
-        }
-        $rendezvous = null;
-
-        if ($rendezvousId) {
-            $rendezvousRepository = $em->getRepository(RendezVous::class);
-            $rendezvous = $rendezvousRepository->find($rendezvousId);
+        if (!$this->isGranted("ROLE_ADMIN") && !$this->isValidUserForRdv($rendezvousId, $this->security->getUser())) {
+            $this->addFlash('danger', "Vous n'êtes pas autorisé à modifier ce rendez-vous.");
+            return;
         }
 
-       $entityInstance->setDatetime(new \DateTimeImmutable);
-       $entityInstance->setIdRdv($rendezvous);
-       
-       parent::persistEntity($em, $entityInstance);
+        $rendezvous = $rendezvousId ? $em->getRepository(RendezVous::class)->find($rendezvousId) : null;
 
+        if ($rendezvous) {
+            $entityInstance->setIdRdv($rendezvous);
+            $entityInstance->setDatetime(new \DateTimeImmutable);
+        }
+
+        parent::persistEntity($em, $entityInstance);
     }
 
     public function createIndexQueryBuilder(
         SearchDto $searchDto,
         EntityDto $entityDto,
-        FieldCollection $fields,
-        FilterCollection $filters
+        $fields,
+        $filters
     ): QueryBuilder {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-
         $user = $this->security->getUser();
 
         if (!$user) {
-            
-            throw new \Exception('You must be logged in to access this section.');
+            $this->addFlash('danger', 'Vous devez être connecté pour accéder à cette section.');
+            throw new \RuntimeException("User not logged in.");
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-        $rendezvousId = $request->query->get('rendezvousId');
+        $rendezvousId = $this->requestStack->getCurrentRequest()->query->get('rendezvousId');
 
-        if($this->isGranted("ROLE_ADMIN")){
-            $queryBuilder->andWhere('entity.IdRdv = :rendezvousId');
-            $queryBuilder->setParameter('rendezvousId', $rendezvousId);
+        if (!$rendezvousId && $referrer = $this->requestStack->getCurrentRequest()->query->get('referrer')) {
+            $referrerParts = parse_url($referrer);
+            parse_str($referrerParts['query'] ?? '', $referrerQuery);
+            $rendezvousId = $referrerQuery['rendezvousId'] ?? null;
         }
-        else{
-            $queryBuilder->join('entity.IdRdv', 'rdv');
-            $queryBuilder->andWhere('entity.IdRdv = :rendezvousId');
-            $queryBuilder->setParameter('rendezvousId', $rendezvousId);
-            
-            if (!$this->testoriginerdv($rendezvousId, $user)) {
-                throw new \Exception("Vous n'êtes pas à l'origine de ce rendez-vous."); // vous pouvez changer cette ligne pour utiliser une exception personnalisée si vous en avez une.
+        
+        if ($this->isGranted("ROLE_ADMIN")) {
+            $queryBuilder->andWhere('entity.IdRdv = :rendezvousId')
+                         ->setParameter('rendezvousId', $rendezvousId);
+        } else {
+            if (!$this->isValidUserForRdv($rendezvousId, $user)) {
+                $this->addFlash('danger', "Vous n'avez pas la permission de voir ces formulaires ou ils n'existent pas.");
+                throw new \RuntimeException("User not authorized for this RDV.");
             }
-        
-            $queryBuilder->andWhere('rdv.commercial = :user');
-            $queryBuilder->setParameter('user', $user);
-        
-            
+
+            $queryBuilder->join('entity.IdRdv', 'rdv')
+                         ->andWhere('rdv.commercial = :user')
+                         ->andWhere('entity.IdRdv = :rendezvousId')
+                         ->setParameter('user', $user)
+                         ->setParameter('rendezvousId', $rendezvousId);
         }
-        
 
         return $queryBuilder;
     }
 
-    private function testoriginerdv($rendezvousId, $user) {
-        
-        $rdvRepository = $this->entityManager->getRepository(RendezVous::class);
-        $rdv = $rdvRepository->find($rendezvousId);
+    private function isValidUserForRdv($rendezvousId, $user): bool 
+    {
+        $rdv = $this->entityManager->getRepository(RendezVous::class)->find($rendezvousId);
 
-        if (!$rdv) {
-            return false;
-        }
-        return $rdv->getCommercial() == $user; 
+        return $rdv && $rdv->getCommercial() === $user;
     }
-
-    // public function configureActions(Actions $actions): Actions 
-    // {
-    //     return $actions->disable(Action::NEW);
-    // }
 }
