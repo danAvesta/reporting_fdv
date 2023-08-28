@@ -6,6 +6,8 @@ use App\Entity\Rdv;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -29,11 +31,15 @@ class RdvCrudController extends AbstractCrudController
 {
     private $security;
     private $mailer;
+    private $requestStack;
+    private $entityManager;
 
-    public function __construct(Security $security, MailerInterface $mailer)
+    public function __construct(Security $security, MailerInterface $mailer, RequestStack $requestStack, EntityManagerInterface $entityManager)
     {
         $this->security = $security;
         $this->mailer = $mailer;
+        $this->requestStack = $requestStack;
+        $this->entityManager = $entityManager;
     }
 
     public static function getEntityFqcn(): string
@@ -53,11 +59,25 @@ class RdvCrudController extends AbstractCrudController
     {
         $addCalendar = Action::new('addCalendar', 'Ajouter au calendrier')
         ->linkToCrudAction('addCalendar');
+        
+        $readInventaire = Action::new('readInventaire', 'Voir l\'inventaire')
+        ->linkToCrudAction('readInventaire');
 
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_INDEX, $readInventaire)
             ->add(Crud::PAGE_INDEX, $addCalendar)
         ;
+    }
+
+    public function readInventaire(AdminContext $context): Response 
+    {
+        $idRdv = $context->getEntity()->getPrimaryKeyValue();
+        return $this->redirectToRoute('admin', [
+            'crudAction' => 'index',
+            'crudControllerFqcn' => InventaireCrudController::class,
+            'idRdv' => $idRdv
+        ]);
     }
 
     public function addCalendar(AdminContext $context): Response
@@ -152,14 +172,28 @@ class RdvCrudController extends AbstractCrudController
     
     public function configureFields(string $pageName): iterable
     {
-        // yield IdField::new('id');
+        $user = $this->security->getUser();
+
+
+        $idRdv = $this->requestStack->getCurrentRequest()->query->get('entityId');
+
+        if($idRdv){
+            $rdv = $idRdv ? $this->entityManager->getRepository(Rdv::class)->find($idRdv) : null;
+            
+            if($rdv && $rdv->getCommercial() != $user && !$this->isGranted('ROLE_ADMIN')){
+                $this->addFlash('danger', 'Ce rendez-vous ne vous appartient pas.');
+                throw new \RuntimeException("Ce rendez-vous ne vous appartient pas.");
+            }
+        }
+
+        yield IdField::new('id')->hideOnForm();
         yield DateTimeField::new('dateRdv');
         yield TextField::new('nomMagasin');
         yield TextField::new('contactNom');
         yield TelephoneField::new('contactTel'); 
         yield TextField::new('adresseMagasin');
         yield TextField::new('codePostal');
-
+        // yield AssociationField::new('commercial')->hideOnForm()->hideOnDetail();
         if($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_MANAGER')){
             yield AssociationField::new('commercial')->autocomplete();
             yield DateTimeField::new('createDate')->hideOnForm();

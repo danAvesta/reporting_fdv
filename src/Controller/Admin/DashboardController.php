@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Rdv;
 use App\Entity\User;
+use App\Entity\Produit;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
@@ -60,6 +61,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Rendez-vous', 'fas fa-calendar', Rdv::class);
         if ($this->isGranted('ROLE_ADMIN')) {
             yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);
+            yield MenuItem::linkToCrud('Produits', 'fas fa-cart-shopping', Produit::class);
         }
         
         // yield MenuItem::subMenu('Actions', 'fas fa-bars')->setSubItems([]);

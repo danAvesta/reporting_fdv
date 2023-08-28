@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\RdvRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -45,6 +47,14 @@ class Rdv
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contactTel = null;
+
+    #[ORM\OneToMany(mappedBy: 'idRdv', targetEntity: Inventaire::class)]
+    private Collection $inventaires;
+
+    public function __construct()
+    {
+        $this->inventaires = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -167,6 +177,36 @@ class Rdv
     public function setContactTel(?string $contactTel): static
     {
         $this->contactTel = $contactTel;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Inventaire>
+     */
+    public function getInventaires(): Collection
+    {
+        return $this->inventaires;
+    }
+
+    public function addInventaire(Inventaire $inventaire): static
+    {
+        if (!$this->inventaires->contains($inventaire)) {
+            $this->inventaires->add($inventaire);
+            $inventaire->setIdRdv($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInventaire(Inventaire $inventaire): static
+    {
+        if ($this->inventaires->removeElement($inventaire)) {
+            // set the owning side to null (unless already changed)
+            if ($inventaire->getIdRdv() === $this) {
+                $inventaire->setIdRdv(null);
+            }
+        }
 
         return $this;
     }
