@@ -42,6 +42,7 @@ class ChangePasswordController extends AbstractDashboardController
                 $user->setPassword($newPassword);
                 $entityManager->persist($user);
                 $entityManager->flush();
+                $this->addFlash('success', 'Votre mot de passe à bien été modifié.');
                 return $this->redirectToRoute('admin');
             }
         }

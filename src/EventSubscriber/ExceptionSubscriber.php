@@ -18,11 +18,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
     
     public static function getSubscribedEvents()
     {
-        return [
-            KernelEvents::EXCEPTION => [
-                ['processException', 10]
-            ]
-        ];
+        return [KernelEvents::EXCEPTION => [['processException', 10]]];
     }
     
     public function processException(ExceptionEvent $event)
