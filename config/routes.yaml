@@ -3,10 +3,3 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
-lucky_number:
-    path: /lucky/number
-    controller: App\Controller\LuckyController::number
-    
-lucky_numbers:
-    path: /lucky/number
-    controller: App\Controller\LuckyController::numbers
